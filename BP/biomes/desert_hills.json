@@ -1,0 +1,36 @@
+{
+  "format_version": "1.13.0",
+  "minecraft:biome": {
+    "description": {
+      "identifier": "minecraft:desert_hills"
+    },
+    "components": {
+      "minecraft:climate": {
+        "temperature": 2.0,
+        "downfall": 0.0
+      },
+      "minecraft:overworld_height": {
+        "noise_params": [
+          1.0,
+          1.6
+        ]
+      },
+      "minecraft:surface_parameters": {
+        "top_material": "minecraft:sand",
+        "mid_material": "minecraft:sand",
+        "foundation_material": "minecraft:stone",
+        "sea_floor_depth": 4,
+        "sea_material": "minecraft:water",
+        "sea_floor_material": "minecraft:gravel"
+      },
+      "minecraft:overworld_generation_rules": {
+        "generate_for_climates": [
+          [
+            "warm",
+            10
+          ]
+        ]
+      }
+    }
+  }
+}

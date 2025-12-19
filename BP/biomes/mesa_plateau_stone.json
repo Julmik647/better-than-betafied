@@ -1,0 +1,36 @@
+{
+  "format_version": "1.13.0",
+  "minecraft:biome": {
+    "description": {
+      "identifier": "minecraft:mesa_plateau_stone"
+    },
+    "components": {
+      "minecraft:climate": {
+        "temperature": 2.0,
+        "downfall": 0.0
+      },
+      "minecraft:overworld_height": {
+        "noise_params": [
+          1.8,
+          0.5
+        ]
+      },
+      "minecraft:surface_parameters": {
+        "top_material": "minecraft:sand",
+        "mid_material": "minecraft:sandstone",
+        "foundation_material": "minecraft:stone",
+        "sea_floor_depth": 4,
+        "sea_material": "minecraft:water",
+        "sea_floor_material": "minecraft:gravel"
+      },
+      "minecraft:overworld_generation_rules": {
+        "generate_for_climates": [
+          [
+            "warm",
+            5
+          ]
+        ]
+      }
+    }
+  }
+}
