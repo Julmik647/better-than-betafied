@@ -34,7 +34,8 @@ function isWaterLocation(dimension, x, z) {
 
 // find highest safe ground
 function findSafeGround(dimension, x, z) {
-    for (let y = 100; y > 50; y--) {
+    // search from high to low for solid ground
+    for (let y = 120; y > 40; y--) {
         try {
             const block = dimension.getBlock({ x, y, z });
             const above1 = dimension.getBlock({ x, y: y + 1, z });
@@ -50,10 +51,8 @@ function findSafeGround(dimension, x, z) {
             // must have 2 air above (not water!)
             if (above1.typeId !== "minecraft:air" || above2.typeId !== "minecraft:air") continue;
             
-            // prefer surface blocks, accept others if y > 62
-            if (SURFACE_BLOCKS.has(type) || y > 62) {
-                return y + 1;
-            }
+            // found valid spot
+            return y + 1;
         } catch (e) {
             continue;
         }
@@ -120,7 +119,7 @@ world.afterEvents.playerSpawn.subscribe((event) => {
                 } catch (e) {
                     console.warn("[Betafied] Spawn error: " + e);
                 }
-            }, 20);
+            }, 40); // wait 40 ticks (2 sec) for chunk to load
         }
         
         system.run(() => trySpawn());

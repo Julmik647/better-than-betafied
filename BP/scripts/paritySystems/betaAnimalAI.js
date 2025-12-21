@@ -2,7 +2,7 @@ import { world, system } from "@minecraft/server";
 
 console.warn("[Betafied] Beta Animal AI Loaded");
 
-// beta 1.7.3 style animals randomly hop around like dumb cuties
+// beta 1.7.3 style animals randomly hop around
 const PASSIVE_MOBS = new Set([
     "minecraft:pig",
     "minecraft:cow",
@@ -13,7 +13,7 @@ const PASSIVE_MOBS = new Set([
 // track jump cooldowns per entity
 const jumpCooldowns = new Map();
 
-// random hop behavior
+// random hop behavior - less frequent, more natural
 system.runInterval(() => {
     const entities = [...world.getDimension("overworld").getEntities()];
     const passiveMobs = entities.filter(e => PASSIVE_MOBS.has(e.typeId));
@@ -26,38 +26,60 @@ system.runInterval(() => {
         const cooldownEnd = jumpCooldowns.get(entityId) || 0;
         if (now < cooldownEnd) continue;
         
-        // count nearby animals - more nearby = more likely to jump
+        // count nearby animals
         const pos = entity.location;
         const nearbyCount = passiveMobs.filter(e => {
             if (e.id === entityId) return false;
             const dx = e.location.x - pos.x;
             const dz = e.location.z - pos.z;
-            return (dx * dx + dz * dz) < 64; // within 8 blocks
+            return (dx * dx + dz * dz) < 64;
         }).length;
         
-        // base 40% chance, +15% per nearby animal
-        const jumpChance = Math.min(0.40 + nearbyCount * 0.15, 0.85);
+        // base 15% chance, +10% per nearby animal (max 50%)
+        const jumpChance = Math.min(0.15 + nearbyCount * 0.10, 0.50);
         if (Math.random() > jumpChance) continue;
         
-        // do 2-6 quick jumps (more when clumped)
-        const baseJumps = 2 + Math.floor(Math.random() * 3); // 2-4
-        const bonusJumps = Math.min(nearbyCount, 2); // up to 2 bonus
-        const jumpCount = baseJumps + bonusJumps;
+        // check if on ground and moving
+        try {
+            const vel = entity.getVelocity();
+            if (Math.abs(vel.y) > 0.1) continue; // skip if already in air
+            
+            // only jump if moving (horizontal velocity > 0.01)
+            const horizontalSpeed = Math.sqrt(vel.x * vel.x + vel.z * vel.z);
+            if (horizontalSpeed < 0.01) continue;
+            
+            // skip if recently hurt (has hurt time)
+            const health = entity.getComponent("health");
+            if (health && entity.lastHurtTime !== undefined && entity.lastHurtTime < 120) continue;
+        } catch (e) { continue; }
         
+        // chickens 1 jump, others 1-3
+        let jumpCount;
+        if (entity.typeId === "minecraft:chicken") {
+            jumpCount = 1;
+        } else {
+            jumpCount = 1 + Math.floor(Math.random() * 3); // 1-3
+        }
+        
+        // natural jumps - wait for landing between each
         for (let i = 0; i < jumpCount; i++) {
             system.runTimeout(() => {
                 try {
                     if (!entity.isValid()) return;
-                    entity.applyImpulse({ x: 0, y: 0.42, z: 0 });
+                    // only jump if on ground
+                    const v = entity.getVelocity();
+                    if (Math.abs(v.y) < 0.1) {
+                        entity.applyImpulse({ x: 0, y: 0.42, z: 0 });
+                    }
                 } catch (e) {}
-            }, i * 8); // 8 ticks between each jump
+            }, i * 15); // 15 ticks between jumps (gives time to land)
         }
         
-        // shorter cooldown (3-10 seconds)
-        const nextJump = now + 3000 + Math.random() * 7000;
+        // longer cooldown (10-30 seconds)
+        const nextJump = now + 10000 + Math.random() * 20000;
         jumpCooldowns.set(entityId, nextJump);
     }
-}, 80); 
+}, 100); // check every 5 seconds
 
 // cleanup dead entities
 system.runInterval(() => {

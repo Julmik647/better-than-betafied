@@ -32,7 +32,8 @@ const BLOCK_CONFIGS = Object.freeze({
   // Stairs that should only be placed in bottom position
   BOTTOM_ONLY_STAIRS: new Set([
     'minecraft:oak_stairs',
-    'minecraft:stone_stairs'
+    'minecraft:stone_stairs',
+    'minecraft:cobblestone_stairs'
   ]),
   
   // Logs that should always be placed vertically
@@ -220,24 +221,27 @@ function handleBlockPlacement(event) {
     }
   }
 
-  // Handle stairs placement
+  // Handle stairs placement - prevent upside-down and corner shapes
   if (BLOCK_CONFIGS.BOTTOM_ONLY_STAIRS.has(block.typeId)) {
     try {
       const viewVector = player.getViewDirection();
       const newDirection = calculateFacingDirection(viewVector);
       
-      // Use a timeout to ensure the block is fully placed
-      system.runTimeout(() => {
+      // force straight shape, no upside-down
+      const setStairsStraight = () => {
         try {
+          if (!block.isValid()) return;
           const permutation = BlockPermutation.resolve(block.typeId, {
             'upside_down_bit': false,
             'weirdo_direction': newDirection
           });
           block.setPermutation(permutation);
-        } catch (error) {
-          console.warn(`Failed to set stairs orientation: ${error.message}`);
-        }
-      }, 1);
+        } catch (error) {}
+      };
+      
+      // apply immediately and again after adjacent block updates
+      system.runTimeout(setStairsStraight, 1);
+      system.runTimeout(setStairsStraight, 3);
     } catch (error) {
       console.warn(`Failed to calculate stairs direction: ${error.message}`);
     }
