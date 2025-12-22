@@ -1,2 +1,2 @@
-Main Developer: Keirazelle / xzelleiv
-Former Maintainer(s): Merb, Notchyves
+- Main Developer: Keirazelle / xzelleiv
+- Former Maintainer(s): Merb, Notchyves
