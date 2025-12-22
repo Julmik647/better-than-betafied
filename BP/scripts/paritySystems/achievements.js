@@ -174,7 +174,7 @@ class AchievementSystem {
             const id = item.typeId;
 
             if (id.includes("_log")) hasLog = true;
-            if (id === "minecraft:crafting_table") hasBench = true;
+            if (id === "minecraft:crafting_table" || id === "bh:crafting_table") hasBench = true;
             if (id.includes("wooden_sword")) hasSword = true;
             if (id.includes("wooden_hoe")) hasHoe = true;
             if (id.includes("wooden_pickaxe")) hasWoodPick = true;

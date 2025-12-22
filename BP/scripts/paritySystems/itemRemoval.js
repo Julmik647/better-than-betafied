@@ -104,6 +104,24 @@ class ItemRestrictionSystem {
 
       // custom/meta
       "bh:bow", "bh:crafting_table", "hrb:herobrine_settings", "hrb:script_openSettings", "minecraft:barrier",
+
+      // convertible modern items (whitelist so they can be converted to stone/wood instead of deleted)
+      "minecraft:andesite", "minecraft:granite", "minecraft:diorite", "minecraft:tuff", "minecraft:calcite",
+      "minecraft:dripstone_block", "minecraft:deepslate", "minecraft:smooth_basalt", "minecraft:cobbled_deepslate",
+      "minecraft:copper_ingot", "minecraft:raw_copper", "minecraft:copper_ore", "minecraft:deepslate_copper_ore",
+      "minecraft:raw_copper_block", "minecraft:copper_block", "minecraft:cut_copper", "minecraft:exposed_copper",
+      "minecraft:weathered_copper", "minecraft:oxidized_copper", "minecraft:waxed_copper_block",
+      "minecraft:waxed_cut_copper", "minecraft:waxed_exposed_copper", "minecraft:waxed_weathered_copper",
+      "minecraft:waxed_oxidized_copper",
+      "minecraft:cherry_log", "minecraft:mangrove_log", "minecraft:bamboo_block", "minecraft:crimson_stem",
+      "minecraft:warped_stem", "minecraft:stripped_cherry_log", "minecraft:stripped_mangrove_log",
+      "minecraft:stripped_bamboo_block", "minecraft:cherry_planks", "minecraft:mangrove_planks",
+      "minecraft:bamboo_planks", "minecraft:crimson_planks", "minecraft:warped_planks", "minecraft:pale_oak_log",
+      "minecraft:pale_oak_planks", "minecraft:mud", "minecraft:muddy_mangrove_roots", "minecraft:suspicious_sand",
+      "minecraft:suspicious_gravel", "minecraft:cornflower", "minecraft:lily_of_the_valley", "minecraft:blue_orchid",
+      "minecraft:allium", "minecraft:azure_bluet", "minecraft:red_tulip", "minecraft:orange_tulip", "minecraft:white_tulip",
+      "minecraft:pink_tulip", "minecraft:oxeye_daisy", "minecraft:wither_rose", "minecraft:peony", "minecraft:rose_bush",
+      "minecraft:lilac", "minecraft:sunflower", "minecraft:pink_petals", "minecraft:torchflower", "minecraft:pitcher_plant",
     ]);
   }
 

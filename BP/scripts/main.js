@@ -24,6 +24,7 @@ import 'paritySystems/randomSpawn.js';
 import 'paritySystems/swordMining.js';
 import 'paritySystems/betaAnimalAI.js';
 import 'paritySystems/netherIce.js';
+import 'paritySystems/betaStacking.js';
  
 // disabled cause 
 // import './modules/chunk_scrubber.js';
