@@ -1,0 +1,1 @@
+// chat2console disabled chatSend event not in API 1.17.0

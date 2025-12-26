@@ -1,33 +1,41 @@
-// --- Betafied Reference Systems ---
-// Core Parity Systems
-import 'paritySystems/armorSystem.js';
-// unified: mob whitelist, xp removal, ore drops, loot
-import 'paritySystems/entitySpawnHandler.js';
-import 'paritySystems/achievements.js';
-import 'paritySystems/foodSystem.js';
-import 'paritySystems/placementSystem.js';
-import 'paritySystems/machineGunBow.js';
-import 'paritySystems/help.js';
-import 'paritySystems/playerLoop.js'; // unified: noSprint, noOffhand, bubbleFix
+// main.js
+console.warn("[keirazelle] Loading Core Systems...");
 
-import 'paritySystems/limit.js';
-import 'paritySystems/PortalDeathFix.js';
-import 'paritySystems/fogFix.js';
-import 'paritySystems/boatBreak.js';
-import 'paritySystems/nightmares.js';
-import 'paritySystems/island.js';
-import 'paritySystems/instantBonemeal.js';
-import 'paritySystems/sword.js';
-import 'paritySystems/portalRemoval.js';
-import 'paritySystems/randomSpawn.js';
-import 'paritySystems/swordMining.js';
-import 'paritySystems/betaAnimalAI.js';
-import 'paritySystems/netherIce.js';
- 
-// modules
-import './modules/entity_cleaner.js';
-import './modules/InventoryManager.js'; // unified: item whitelist, conversions, food
+// core
+import './core/InventoryManager.js'; // item management
+import './core/achievements.js';
+import './core/help.js';
+import './core/limit.js';
+import './core/chat2console.js';
 
-// Initialize
-console.warn("[Betafied] Main System Loaded - All Modules Initialized");
+// gameplay
+import './gameplay/armorSystem.js';
+import './gameplay/foodSystem.js';
+import './gameplay/machineGunBow.js';
+import './gameplay/sword.js';
+import './gameplay/swordMining.js';
+import './gameplay/boatBreak.js';
+import './gameplay/instantBonemeal.js';
+import './gameplay/placementSystem.js';
+import './gameplay/playerLoop.js'; // sprinting, offhand, bubble fix
+import './gameplay/PortalDeathFix.js';
+
+// world gen
+import './world/chunk_scrubber.js';
+import './world/portalRemoval.js';
+import './world/rough_bedrock.js';
+import './world/netherIce.js';
+import './world/fogFix.js';
+import './world/island.js';
+import './world/dimensions.js';
+
+// mobs
+import './mobs/entitySpawnHandler.js';
+import './mobs/entity_cleaner.js';
+import './mobs/betaAnimalAI.js';
+import './mobs/nightmares.js';
+import './mobs/randomSpawn.js';
+
+// init
+console.warn("[keirazelle] Main System Loaded - All Modules Initialized");
 

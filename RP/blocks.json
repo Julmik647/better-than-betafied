@@ -3996,10 +3996,11 @@
         "sound": "sand",
         "textures": "red_concrete_powder"
     },
+
     "red_flower": {
         "isotropic": false,
         "sound": "grass",
-        "textures": "red_flower"
+        "textures": "flower_rose"
     },
     "red_glazed_terracotta": {
         "isotropic": false,
@@ -4117,6 +4118,7 @@
         }
     },
     "reeds": {
+        "carried_textures": "reeds",
         "isotropic": false,
         "sound": "grass",
         "textures": "reeds"
