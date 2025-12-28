@@ -5421,5 +5421,10 @@
         "isotropic": false,
         "sound": "cloth",
         "textures": "wool_colored_yellow"
+    },
+    "bh:wooden_slab": {
+        "isotropic": false,
+        "sound": "stone",
+        "textures": "planks_oak"
     }
 }

@@ -1,9 +1,10 @@
 // main.js
-console.warn("[keirazelle] loading systems...");
+console.warn("[keirazelle] Loading Core Systems...");
 
 // core
 import './core/InventoryManager.js'; // items
 import './core/achievements.js';
+import './core/welcome.js';
 import './core/help.js';
 import './core/limit.js';
 import './core/chat2console.js';
@@ -17,7 +18,7 @@ import './gameplay/swordMining.js';
 import './gameplay/boatBreak.js';
 import './gameplay/instantBonemeal.js';
 import './gameplay/placementSystem.js';
-import './gameplay/playerLoop.js'; // loop stuff
+import './gameplay/playerLoop.js'; // loop optimization
 // import './gameplay/fenceSystem.js'; // fuck ts
 import './gameplay/PortalDeathFix.js';
 
@@ -38,5 +39,5 @@ import './mobs/nightmares.js';
 import './mobs/randomSpawn.js';
 
 // init
-console.warn("[keirazelle] all systems go");
+console.warn("[keirazelle] Initialized");
 

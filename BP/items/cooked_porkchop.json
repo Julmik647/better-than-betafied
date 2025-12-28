@@ -8,7 +8,7 @@
                 "group": "itemGroup.name.miscFood"
             }
         },
-        "components": {
+        "components": { 
             "minecraft:max_stack_size": 1,
             "minecraft:icon": {
                 "textures": {
@@ -21,7 +21,6 @@
             },
             "minecraft:food": {
                 "nutrition": 8,
-                "saturation_modifier": 0.8,
                 "can_always_eat": false
             }
         }

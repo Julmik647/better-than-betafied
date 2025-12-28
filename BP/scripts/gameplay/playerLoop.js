@@ -1,36 +1,39 @@
-// unified player loop - handles nosprint, nooffhand, water state
-// optimized: single loop, single interval, minimal overhead
-
 import { world, system, EquipmentSlot } from "@minecraft/server";
 console.warn("[keirazelle] Player Loop Loaded");
+const CONFIG = Object.freeze({
+    TICK_INTERVAL: 20,
+    HUNGER_LOCK: 5
+});
 
 const playerWaterState = new Map();
 
-system.runInterval(() => {
-    for (const player of world.getPlayers()) {
+// generator fn to distribute player processing across ticks
+function* processPlayers() {
+    const players = world.getPlayers();
+    
+    for (const player of players) {
         try {
             const isCreative = player.getGameMode() === "creative";
 
-            // --- no xp: reset level ---
+            // no orbs:p
             if (player.level > 0 || player.xpEarnedAtCurrentLevel > 0) {
                 player.resetLevel();
             }
             
-            // --- no sprint: keep hunger at 5 (below sprint threshold of 6) ---
             if (!isCreative) {
                 const hunger = player.getComponent("minecraft:hunger");
-                if (hunger?.currentValue !== 5) {
-                    hunger?.setCurrentValue(5);
+                if (hunger?.currentValue !== CONFIG.HUNGER_LOCK) {
+                    hunger?.setCurrentValue(CONFIG.HUNGER_LOCK);
                 }
             }
             
-            // --- no offhand: clear offhand slot ---
+            // no offhand
             const equippable = player.getComponent("minecraft:equippable");
             if (equippable?.getEquipment(EquipmentSlot.Offhand)) {
                 equippable.setEquipment(EquipmentSlot.Offhand, undefined);
             }
             
-            // --- water state: clear actionbar when leaving water ---
+            // water state
             const pos = player.location;
             const block = player.dimension.getBlock({
                 x: Math.floor(pos.x),
@@ -47,9 +50,18 @@ system.runInterval(() => {
                 player.onScreenDisplay.setActionBar("");
                 playerWaterState.set(player.id, false);
             }
-        } catch (e) {}
+        } catch (e) {
+            // log errors
+            console.warn(`[playerLoop] error processing ${player?.name}: ${e}`);
+        }
+        
+        yield;
     }
-}, 20); // 20 ticks = 1s, responsive enough
+}
+
+system.runInterval(() => {
+    system.runJob(processPlayers());
+}, CONFIG.TICK_INTERVAL);
 
 // cleanup on leave
 world.afterEvents.playerLeave.subscribe((event) => {

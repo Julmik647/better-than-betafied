@@ -47,7 +47,8 @@
       "minecraft:behavior.melee_attack": {
         "priority": 2,
         "speed_multiplier": 1.0,
-        "track_target": true
+        "track_target": true,
+        "reach_multiplier": 0.8
       },
       "minecraft:behavior.random_stroll": {
         "priority": 6,

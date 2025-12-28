@@ -138,6 +138,7 @@
         "bamboo_planks": { "textures": "textures/blocks/planks_oak" },
         "crimson_planks": { "textures": "textures/blocks/planks_oak" },
         "warped_planks": { "textures": "textures/blocks/planks_oak" },
+        "planks_oak": { "textures": "textures/blocks/planks_oak" },
         
         "vine": { "textures": "textures/blocks/invisible" },
         "vine_carried": { "textures": "textures/blocks/invisible" },

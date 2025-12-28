@@ -50,7 +50,7 @@
             "render_controllers": [
                 "controller.render.skeleton"
             ],
-            "enable_attachables": false
+            "enable_attachables": true
         }
     }
 }

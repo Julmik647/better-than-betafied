@@ -1,14 +1,13 @@
 import { world, system, ItemStack } from "@minecraft/server";
-
 console.warn("[keirazelle] Inventory Manager Loaded");
 
-// config
-const CHECK_INTERVAL = 20; // every second
-const MESSAGE_COOLDOWN = 60;
-const REMOVE_MSG = "§c[keirazelle] §7That item doesn't exist in Beta 1.7.3!";
+const CONFIG = Object.freeze({
+    CHECK_INTERVAL: 20,
+    MESSAGE_COOLDOWN: 60,
+    REMOVE_MSG: "§c[keirazelle] §7That item doesn't exist in Beta 1.7.3!"
+});
 
-// beta 1.7.3 allowed items
-const ALLOWED = new Set([
+const ALLOWED = Object.freeze(new Set([
     // tools & weapons
     "minecraft:wooden_pickaxe", "minecraft:stone_pickaxe", "minecraft:iron_pickaxe",
     "minecraft:golden_pickaxe", "minecraft:diamond_pickaxe",
@@ -30,11 +29,11 @@ const ALLOWED = new Set([
     "minecraft:golden_helmet", "minecraft:golden_chestplate", "minecraft:golden_leggings", "minecraft:golden_boots",
     "minecraft:diamond_helmet", "minecraft:diamond_chestplate", "minecraft:diamond_leggings", "minecraft:diamond_boots",
 
-    // food (vanilla versions for conversion, plus custom bh: versions)
+    // food (vanilla + custom bh: versions)
     "minecraft:apple", "minecraft:golden_apple", "minecraft:mushroom_stew", "minecraft:bread",
     "minecraft:porkchop", "minecraft:cooked_porkchop", "minecraft:cod", "minecraft:cooked_cod",
     "minecraft:cookie", "minecraft:cake",
-    "bh:apple", "bh:bread", "bh:porkchop", "bh:cooked_porkchop", 
+    "bh:apple", "bh:bread", "bh:porkchop", "bh:cooked_porkchop",
     "bh:cod", "bh:cooked_cod", "bh:golden_apple", "bh:cookie",
 
     // raw materials & dyes
@@ -87,11 +86,10 @@ const ALLOWED = new Set([
     "minecraft:water", "minecraft:lava",
 
     // custom/meta
-    "bh:bow", "bh:fence", "bh:crafting_table", "hrb:herobrine_settings", "hrb:script_openSettings", "minecraft:barrier"
-]);
+    "bh:bow", "bh:fence", "bh:crafting_table", "bh:wooden_slab", "hrb:herobrine_settings", "hrb:script_openSettings", "minecraft:barrier"
+]));
 
-// conversions: modern -> beta equivalent
-const CONVERSIONS = {
+const CONVERSIONS = Object.freeze({
     // stone variants
     "minecraft:andesite": "minecraft:stone",
     "minecraft:granite": "minecraft:stone",
@@ -103,7 +101,7 @@ const CONVERSIONS = {
     "minecraft:smooth_basalt": "minecraft:stone",
     "minecraft:cobbled_deepslate": "minecraft:cobblestone",
 
-    // copper -> cobble (anti-exploit)
+    // copper -> cobble
     "minecraft:copper_ingot": "minecraft:cobblestone",
     "minecraft:raw_copper": "minecraft:cobblestone",
     "minecraft:copper_ore": "minecraft:stone",
@@ -165,16 +163,16 @@ const CONVERSIONS = {
 
     // flesh -> feathers
     "minecraft:rotten_flesh": "minecraft:feather",
-    
-    // bow
+
+    // bow & fence
     "minecraft:bow": "bh:bow",
+    "minecraft:fence": "bh:fence",
+    
+    // petrified oak slab (stone properties, wood texture)
+    "minecraft:oak_slab": "bh:wooden_slab"
+});
 
-    // fence
-    "minecraft:fence": "bh:fence"
-};
-
-// food: vanilla -> custom unstackable (spawns 1 per stack item)
-const FOOD_CONVERSIONS = {
+const FOOD_CONVERSIONS = Object.freeze({
     "minecraft:apple": "bh:apple",
     "minecraft:bread": "bh:bread",
     "minecraft:porkchop": "bh:porkchop",
@@ -185,24 +183,37 @@ const FOOD_CONVERSIONS = {
     "minecraft:cookie": "bh:cookie",
     "minecraft:salmon": "bh:cod",
     "minecraft:cooked_salmon": "bh:cooked_cod"
-};
+});
 
-// items to delete entirely (no beta equivalent)
-const DELETE_ITEMS = new Set([
+const DELETE_ITEMS = Object.freeze(new Set([
     "minecraft:mutton", "minecraft:cooked_mutton",
     "minecraft:rabbit", "minecraft:cooked_rabbit",
     "minecraft:rabbit_hide", "minecraft:rabbit_stew", "minecraft:rabbit_foot"
-]);
+]));
 
-// tracking
 const msgCooldowns = new Map();
 
-system.runInterval(() => {
-    for (const player of world.getPlayers()) {
-        if (player.getGameMode() === "creative" || player.hasTag("builder_exempt")) continue;
-        processInventory(player);
+// generator for player processing
+function* processPlayers() {
+    const players = world.getPlayers();
+
+    for (const player of players) {
+        try {
+            if (player.getGameMode() === "creative" || player.hasTag("builder_exempt")) {
+                yield;
+                continue;
+            }
+            processInventory(player);
+        } catch (e) {
+            console.warn(`[INV] error: ${e}`);
+        }
+        yield;
     }
-}, CHECK_INTERVAL);
+}
+
+system.runInterval(() => {
+    system.runJob(processPlayers());
+}, CONFIG.CHECK_INTERVAL);
 
 function processInventory(player) {
     const inv = player.getComponent("inventory")?.container;
@@ -215,26 +226,20 @@ function processInventory(player) {
         if (!item) continue;
         const id = item.typeId;
 
-        // 1. food conversions
-        // fix: swap slot, no deletions so nick can playtest properly lol
+        // 1. food conversions - spawn extras as drops instead of loop
         if (FOOD_CONVERSIONS[id]) {
             const newId = FOOD_CONVERSIONS[id];
             const amount = item.amount;
-            
-            // make space
-            inv.setItem(i, undefined);
 
-            // fill slot
             inv.setItem(i, new ItemStack(newId, 1));
 
-            // handle extras from stack
+            // spawn rest as ground items (no loop per item)
             if (amount > 1) {
                 for (let k = 1; k < amount; k++) {
-                   const added = inv.addItem(new ItemStack(newId, 1));
-                   // spill if full
-                   if (added && added.amount > 0) {
-                       player.dimension.spawnItem(added, player.location);
-                   }
+                    const added = inv.addItem(new ItemStack(newId, 1));
+                    if (added?.amount > 0) {
+                        player.dimension.spawnItem(added, player.location);
+                    }
                 }
             }
             continue;
@@ -267,8 +272,8 @@ function processInventory(player) {
 function notifyPlayer(player) {
     const now = system.currentTick;
     const last = msgCooldowns.get(player.id) ?? 0;
-    if (now - last >= MESSAGE_COOLDOWN) {
-        player.sendMessage(REMOVE_MSG);
+    if (now - last >= CONFIG.MESSAGE_COOLDOWN) {
+        player.sendMessage(CONFIG.REMOVE_MSG);
         msgCooldowns.set(player.id, now);
     }
 }

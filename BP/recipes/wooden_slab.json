@@ -4,25 +4,21 @@
         "description": {
             "identifier": "bh:wooden_slab"
         },
-        "tags": [
-            "beta_crafting"
-        ],
-        "pattern": [
-            "###"
-        ],
+        "tags": ["beta_crafting", "crafting_table"],
+        "pattern": ["###"],
         "key": {
             "#": {
-                "item": "minecraft:planks"
+                "item": "minecraft:oak_planks"
             }
         },
         "unlock": [
             {
-                "tag": "minecraft:stone_crafting_materials"
+                "item": "minecraft:oak_planks"
             }
         ],
         "result": {
-            "item": "minecraft:oak_slab",
-            "count": 3
+            "item": "bh:wooden_slab",
+            "count": 6
         }
     }
 }
