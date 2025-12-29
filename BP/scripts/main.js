@@ -19,8 +19,8 @@ import './gameplay/boatBreak.js';
 import './gameplay/instantBonemeal.js';
 import './gameplay/placementSystem.js';
 import './gameplay/playerLoop.js'; // loop optimization
-// import './gameplay/fenceSystem.js'; // fuck ts
 import './gameplay/PortalDeathFix.js';
+// import './gameplay/fenceSystem.js'; // disabled for now
 
 // world gen
 import './world/chunk_scrubber.js';

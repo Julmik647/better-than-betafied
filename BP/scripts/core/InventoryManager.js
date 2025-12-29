@@ -166,9 +166,9 @@ const CONVERSIONS = Object.freeze({
 
     // bow & fence
     "minecraft:bow": "bh:bow",
-    "minecraft:fence": "bh:fence",
+    "minecraft:oak_fence": "bh:fence",
     
-    // petrified oak slab (stone properties, wood texture)
+    // slab
     "minecraft:oak_slab": "bh:wooden_slab"
 });
 

@@ -1,89 +1,104 @@
-import { world, system, BlockPermutation } from "@minecraft/server";
+import { world, system } from "@minecraft/server";
+console.warn("[keirazelle] Beta Fence System Loaded");
 
-console.warn("[keirazelle] Beta Fence Loaded");
+// beta 1.7.3: fences only connect to other fences, not walls/panes/blocks
+const CONFIG = Object.freeze({
+    FENCE_ID: "bh:fence",
+    CHECK_INTERVAL: 2,
+    DIRECTIONS: Object.freeze({
+        north: { x: 0, z: -1, state: "bh:north" },
+        south: { x: 0, z: 1, state: "bh:south" },
+        east: { x: 1, z: 0, state: "bh:east" },
+        west: { x: -1, z: 0, state: "bh:west" }
+    })
+});
 
-const DIRECTIONS = [
-    { name: "north", offset: { x: 0, y: 0, z: -1 }, state: "bh:north" },
-    { name: "south", offset: { x: 0, y: 0, z: 1 }, state: "bh:south" },
-    { name: "east", offset: { x: 1, y: 0, z: 0 }, state: "bh:east" },
-    { name: "west", offset: { x: -1, y: 0, z: 0 }, state: "bh:west" }
-];
+// deduplication map using string keys
+const pendingUpdates = new Map();
 
-const CONNECTABLES = new Set([
-    "bh:fence",
-    "minecraft:fence_gate",
-    "minecraft:wooden_door",
-    "minecraft:trapdoor" 
-]);
-
-function updateFence(block) {
-    if (!block || !block.isValid()) return;
-    if (block.typeId !== "bh:fence") return;
-
-    try {
-        const currentPerm = block.permutation;
-        const states = {};
-        
-    
-        for (const dir of DIRECTIONS) {
-            const neighbor = block.offset(dir.offset);
-            let connects = false;
-            
-            if (neighbor && neighbor.isValid()) {
-                if (CONNECTABLES.has(neighbor.typeId)) {
-                    connects = true;
-                }
-            }
-            states[dir.state] = connects;
-        }
-
-        block.setPermutation(currentPerm.withStates(states));
-    } catch (e) {
-    }
-}
-
-function updateNeighbors(centerBlock) {
-    for (const dir of DIRECTIONS) {
-        try {
-            const neighbor = centerBlock.offset(dir.offset);
-            if (neighbor?.typeId === "bh:fence") {
-                updateFence(neighbor);
-            }
-        } catch {}
-    }
-}
-
-world.afterEvents.blockPlace.subscribe((event) => {
+// when fence is placed, update it and all neighbors
+world.afterEvents.playerPlaceBlock.subscribe((event) => {
     const block = event.block;
+    if (block.typeId !== CONFIG.FENCE_ID) return;
     
-    if (block.typeId === "minecraft:fence") {
-        // swap to bh:fence
-        block.setPermutation(BlockPermutation.resolve("bh:fence"));
-        // then update it
-        updateFence(block);
-        updateNeighbors(block);
-        return;
-    }
-
-    // normal bh:fence logic
-    if (block.typeId === "bh:fence") {
-        updateFence(block);
-        updateNeighbors(block);
-    } else {
-        // if gate:p
-        updateNeighbors(block);
+    // update placed fence
+    scheduleUpdate(block.location, block.dimension);
+    
+    // also update neighbor fences so they connect to us
+    for (const dir of Object.values(CONFIG.DIRECTIONS)) {
+        const neighborLoc = {
+            x: block.location.x + dir.x,
+            y: block.location.y,
+            z: block.location.z + dir.z
+        };
+        scheduleUpdate(neighborLoc, block.dimension);
     }
 });
 
-// break logic
+// when block is broken, update neighbor fences
 world.afterEvents.playerBreakBlock.subscribe((event) => {
     const loc = event.block.location;
-    const dim = event.dimension;
+    const dim = event.block.dimension;
     
-    for (const dir of DIRECTIONS) {
-        try {
-            const neighbor = dim.getBlock({ x: loc.x + dir.offset.x, y: loc.y, z: loc.z + dir.offset.z });
-            if (neighbor?.typeId === "bh:fence") updateFence(neighbor);
-        } catch {}
+    for (const dir of Object.values(CONFIG.DIRECTIONS)) {
+        const neighborLoc = { x: loc.x + dir.x, y: loc.y, z: loc.z + dir.z };
+        scheduleUpdate(neighborLoc, dim);
     }
 });
+
+function scheduleUpdate(location, dimension) {
+    // use string key for proper deduplication
+    const key = `${dimension.id}:${Math.floor(location.x)},${Math.floor(location.y)},${Math.floor(location.z)}`;
+    pendingUpdates.set(key, { location, dimension });
+}
+
+// process pending updates
+system.runInterval(() => {
+    if (pendingUpdates.size === 0) return;
+    
+    for (const [key, update] of pendingUpdates.entries()) {
+        try {
+            const block = update.dimension.getBlock(update.location);
+            if (!block || block.typeId !== CONFIG.FENCE_ID) continue;
+            
+            updateFenceConnections(block);
+        } catch (e) {
+            // chunk not loaded or block error, skip
+        }
+    }
+    
+    pendingUpdates.clear();
+}, CONFIG.CHECK_INTERVAL);
+
+function updateFenceConnections(block) {
+    const perm = block.permutation;
+    let newPerm = perm;
+    let changed = false;
+    
+    for (const [name, dir] of Object.entries(CONFIG.DIRECTIONS)) {
+        const neighborLoc = {
+            x: block.location.x + dir.x,
+            y: block.location.y,
+            z: block.location.z + dir.z
+        };
+        
+        let shouldConnect = false;
+        
+        try {
+            const neighbor = block.dimension.getBlock(neighborLoc);
+            shouldConnect = neighbor !== null && neighbor.typeId === CONFIG.FENCE_ID;
+        } catch (e) {
+            shouldConnect = false;
+        }
+        
+        const currentState = perm.getState(dir.state);
+        if (currentState !== shouldConnect) {
+            newPerm = newPerm.withState(dir.state, shouldConnect);
+            changed = true;
+        }
+    }
+    
+    if (changed) {
+        block.setPermutation(newPerm);
+    }
+}

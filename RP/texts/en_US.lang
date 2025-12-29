@@ -10,5 +10,5 @@ item.bh:cooked_cod=Cooked Fish
 item.bh:golden_apple=Golden Apple
 item.bh:cookie=Cookie
 item.bh:bow=Bow
-tile.bh:fence.name=Fence
 tile.bh:wooden_slab.name=Wooden Slab
+tile.bh:fence.name=Fence

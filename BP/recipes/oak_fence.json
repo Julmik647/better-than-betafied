@@ -2,17 +2,18 @@
     "format_version": "1.20.10",
     "minecraft:recipe_shaped": {
         "description": {
-            "identifier": "bh:oak_fence"
+            "identifier": "bh:fence_recipe"
         },
-        "tags": [
-            "beta_crafting"
-        ],
+        "tags": ["beta_crafting", "crafting_table"],
         "pattern": [
-            "WWW",
-            "WWW"
+            "PSP",
+            "PSP"
         ],
         "key": {
-            "W": {
+            "P": {
+                "item": "minecraft:oak_planks"
+            },
+            "S": {
                 "item": "minecraft:stick"
             }
         },
@@ -22,7 +23,7 @@
             }
         ],
         "result": {
-            "item": "minecraft:oak_fence",
+            "item": "bh:fence",
             "count": 2
         }
     }

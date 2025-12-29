@@ -5426,5 +5426,10 @@
         "isotropic": false,
         "sound": "stone",
         "textures": "planks_oak"
+    },
+    "bh:fence": {
+        "isotropic": false,
+        "sound": "wood",
+        "textures": "planks_oak"
     }
 }
