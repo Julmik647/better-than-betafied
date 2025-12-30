@@ -25,7 +25,7 @@ import './gameplay/PortalDeathFix.js';
 // world gen
 import './world/chunk_scrubber.js';
 import './world/portalRemoval.js';
-import './world/rough_bedrock.js';
+// import './world/rough_bedrock.js'; // disabled for now
 import './world/netherIce.js';
 import './world/fogFix.js';
 import './world/island.js';
