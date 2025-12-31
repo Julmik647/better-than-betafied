@@ -36,8 +36,7 @@ const CONFIG = Object.freeze({
 
 const lastHaste = new Map();
 
-// direct loop - 4 tick interval is too fast for generator overhead
-system.runInterval(() => {
+function* miningCheck() {
     for (const player of world.getPlayers()) {
         try {
             const playerId = player.id;
@@ -62,6 +61,7 @@ system.runInterval(() => {
                 continue;
             }
 
+            // raycast is heavy, good thing we're in a job
             const blockRay = player.getBlockFromViewDirection({ maxDistance: CONFIG.MAX_DISTANCE });
             const lookingAtFast = blockRay?.block && SWORD_FAST_BLOCKS.has(blockRay.block.typeId);
 
@@ -78,7 +78,13 @@ system.runInterval(() => {
         } catch (e) {
             console.warn(`[swordMining] error: ${e}`);
         }
+        yield;
     }
+}
+
+// using runJob to parse out the raycasts
+system.runInterval(() => {
+    system.runJob(miningCheck());
 }, CONFIG.TICK_INTERVAL);
 
 // cleanup on leave

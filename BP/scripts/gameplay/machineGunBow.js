@@ -18,8 +18,7 @@ world.afterEvents.itemCompleteUse.subscribe(({ source: player, itemStack: item }
             const slotItem = inv.getItem(i);
             if (slotItem?.typeId === "minecraft:arrow") {
                 if (slotItem.amount > 1) {
-                    slotItem.amount--;
-                    inv.setItem(i, slotItem);
+                    inv.setItem(i, new ItemStack("minecraft:arrow", slotItem.amount - 1));
                 } else {
                     inv.setItem(i, undefined);
                 }
@@ -30,20 +29,29 @@ world.afterEvents.itemCompleteUse.subscribe(({ source: player, itemStack: item }
         if (!hasArrow) return;
     }
 
-    // damage the bow
+    // durability handling
     if (!isCreative) {
         const slot = player.selectedSlotIndex;
         const heldBow = inv.getItem(slot);
         if (heldBow?.typeId === "bh:bow") {
             const dur = heldBow.getComponent("durability");
             if (dur) {
-                dur.damage += 1;
-                // break if maxed
-                if (dur.damage >= dur.maxDurability) {
+                const currentDamage = dur.damage;
+                const newDamage = currentDamage + 1;
+                
+                if (newDamage >= dur.maxDurability) {
+                    // bow breaks, no arrow spawns
                     inv.setItem(slot, undefined);
                     player.playSound("random.break");
+                    return;
                 } else {
-                    inv.setItem(slot, heldBow);
+                    // make new bow with correct damage
+                    const newBow = new ItemStack("bh:bow", 1);
+                    const newDur = newBow.getComponent("durability");
+                    if (newDur) {
+                        newDur.damage = newDamage;
+                        inv.setItem(slot, newBow);
+                    }
                 }
             }
         }

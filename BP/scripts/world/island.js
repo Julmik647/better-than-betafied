@@ -17,6 +17,9 @@ function* islandJob() {
     for (const player of players) {
         if (!player.hasTag("voided")) continue;
         
+        // only trap in overworld
+        if (player.dimension.id !== "minecraft:overworld") continue;
+        
         try {
             const loc = player.location;
 

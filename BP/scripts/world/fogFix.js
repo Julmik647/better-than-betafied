@@ -23,7 +23,7 @@ function* fogJob() {
                 }
             } else {
                 if (hasFog.has(name)) {
-                    player.runCommand(`fog @s pop "${CONFIG.FOG_ID}"`);
+                    player.runCommand(`fog @s pop ${CONFIG.FOG_ID}`);
                     hasFog.delete(name);
                 }
             }

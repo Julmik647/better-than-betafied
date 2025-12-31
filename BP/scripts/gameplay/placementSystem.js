@@ -206,7 +206,31 @@ function handleBlockPlacement(event) {
   
   if (!block || !player) return;
 
-  // First handle waterlogging prevention
+  // handle doors - clear water from both halves
+  if (block.typeId.includes('_door')) {
+    try {
+      const dim = block.dimension;
+      const loc = block.location;
+      const isTop = block.permutation.getState('upper_block_bit');
+      
+      // get both halves
+      const topLoc = isTop ? loc : { x: loc.x, y: loc.y + 1, z: loc.z };
+      const botLoc = isTop ? { x: loc.x, y: loc.y - 1, z: loc.z } : loc;
+      
+      // clear water at both locations
+      const topBlock = dim.getBlock(topLoc);
+      const botBlock = dim.getBlock(botLoc);
+      
+      if (topBlock?.typeId === 'minecraft:water' || topBlock?.isWaterlogged) {
+        dim.runCommand(`setblock ${topLoc.x} ${topLoc.y} ${topLoc.z} air replace water`);
+      }
+      if (botBlock?.typeId === 'minecraft:water' || botBlock?.isWaterlogged) {
+        dim.runCommand(`setblock ${botLoc.x} ${botLoc.y} ${botLoc.z} air replace water`);
+      }
+    } catch (e) {}
+  }
+
+  // waterlogging prevention for other blocks
   preventWaterlogging(event);
 
   // Handle slabs placement

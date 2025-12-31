@@ -62,7 +62,7 @@ const ALLOWED = Object.freeze(new Set([
     // construction
     "minecraft:oak_planks", "minecraft:birch_planks", "minecraft:spruce_planks",
     "minecraft:oak_stairs", "minecraft:oak_slab", "minecraft:oak_fence",
-    "minecraft:cobblestone_stairs", "minecraft:stone_stairs", "minecraft:cobblestone_slab", "minecraft:stone_slab",
+    "minecraft:cobblestone_stairs", "minecraft:stone_stairs", "minecraft:cobblestone_slab", "minecraft:stone_slab", "minecraft:smooth_stone_slab", "minecraft:sandstone_slab",
     "minecraft:brick_block", "minecraft:bricks", "minecraft:bookshelf",
     "minecraft:gold_block", "minecraft:iron_block", "minecraft:diamond_block", "minecraft:lapis_block", "minecraft:tnt",
 
@@ -167,8 +167,35 @@ const CONVERSIONS = Object.freeze({
     // bow & fence
     "minecraft:bow": "bh:bow",
     
-    // slab
-    "minecraft:oak_slab": "bh:wooden_slab"
+    // slabs (all wood -> oak style per beta)
+    "minecraft:oak_slab": "bh:wooden_slab",
+    "minecraft:birch_slab": "bh:wooden_slab",
+    "minecraft:spruce_slab": "bh:wooden_slab",
+    "minecraft:jungle_slab": "bh:wooden_slab",
+    "minecraft:acacia_slab": "bh:wooden_slab",
+    "minecraft:dark_oak_slab": "bh:wooden_slab",
+    "minecraft:cherry_slab": "bh:wooden_slab",
+    "minecraft:mangrove_slab": "bh:wooden_slab",
+    "minecraft:bamboo_slab": "bh:wooden_slab",
+    "minecraft:crimson_slab": "bh:wooden_slab",
+    "minecraft:warped_slab": "bh:wooden_slab",
+    "minecraft:pale_oak_slab": "bh:wooden_slab",
+
+    // boats (all -> oak)
+    "minecraft:birch_boat": "minecraft:oak_boat",
+    "minecraft:spruce_boat": "minecraft:oak_boat",
+    "minecraft:jungle_boat": "minecraft:oak_boat",
+    "minecraft:acacia_boat": "minecraft:oak_boat",
+    "minecraft:dark_oak_boat": "minecraft:oak_boat",
+    "minecraft:cherry_boat": "minecraft:oak_boat",
+    "minecraft:mangrove_boat": "minecraft:oak_boat",
+    "minecraft:bamboo_raft": "minecraft:oak_boat",
+
+    // dyes -> raw materials (beta style)
+    "minecraft:white_dye": "minecraft:bone_meal",
+    "minecraft:black_dye": "minecraft:ink_sac",
+    "minecraft:blue_dye": "minecraft:lapis_lazuli",
+    "minecraft:brown_dye": "minecraft:cocoa_beans"
 });
 
 const FOOD_CONVERSIONS = Object.freeze({

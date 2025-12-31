@@ -39,62 +39,65 @@ world.afterEvents.entityHurt.subscribe((ev) => {
 // generator for entity processing
 function* animalJumpJob() {
     const overworld = world.getDimension("overworld");
-    const entities = overworld.getEntities();
     
-    for (const entity of entities) {
-        if (!PASSIVE_MOBS.has(entity.typeId)) continue;
-        if (!entity.isValid()) continue;
+    // query each mob type separately for performance
+    for (const mobType of PASSIVE_MOBS) {
+        const entities = overworld.getEntities({ type: mobType });
         
-        const entityId = entity.id;
+        for (const entity of entities) {
+            if (!entity.isValid()) continue;
+            
+            const entityId = entity.id;
 
-        // hurt stun check
-        const hurtEnd = hurtCooldowns.get(entityId);
-        if (hurtEnd && currentTick < hurtEnd) continue;
-        if (hurtEnd) hurtCooldowns.delete(entityId);
+            // hurt stun check
+            const hurtEnd = hurtCooldowns.get(entityId);
+            if (hurtEnd && currentTick < hurtEnd) continue;
+            if (hurtEnd) hurtCooldowns.delete(entityId);
 
-        // jump cooldown check
-        const jumpEnd = jumpCooldowns.get(entityId);
-        if (jumpEnd && currentTick < jumpEnd) continue;
+            // jump cooldown check
+            const jumpEnd = jumpCooldowns.get(entityId);
+            if (jumpEnd && currentTick < jumpEnd) continue;
 
-        // spatial query for neighbors
-        const nearby = overworld.getEntities({
-            location: entity.location,
-            maxDistance: CONFIG.NEARBY_RADIUS,
-            excludeFamilies: ["inanimate", "player", "monster"]
-        });
-        
-        // count passive neighbors
-        let neighborCount = 0;
-        for (const n of nearby) {
-            if (n.id !== entityId && PASSIVE_MOBS.has(n.typeId)) {
-                neighborCount++;
+            // spatial query for neighbors
+            const nearby = overworld.getEntities({
+                location: entity.location,
+                maxDistance: CONFIG.NEARBY_RADIUS,
+                excludeFamilies: ["inanimate", "player", "monster"]
+            });
+            
+            // count passive neighbors
+            let neighborCount = 0;
+            for (const n of nearby) {
+                if (n.id !== entityId && PASSIVE_MOBS.has(n.typeId)) {
+                    neighborCount++;
+                }
             }
+
+            // jump chance scales with neighbors
+            const jumpChance = Math.min(
+                CONFIG.BASE_JUMP_CHANCE + neighborCount * CONFIG.NEIGHBOR_BONUS,
+                CONFIG.MAX_JUMP_CHANCE
+            );
+            if (Math.random() > jumpChance) continue;
+
+            // physics check
+            try {
+                const vel = entity.getVelocity();
+                if (Math.abs(vel.y) > 0.1) continue;
+                const hSpeed = Math.sqrt(vel.x * vel.x + vel.z * vel.z);
+                if (hSpeed < 0.01) continue;
+            } catch { continue; }
+
+            // do the jump
+            doJump(entity);
+            
+            // set cooldown
+            const cooldown = CONFIG.JUMP_COOLDOWN_MIN + 
+                Math.floor(Math.random() * (CONFIG.JUMP_COOLDOWN_MAX - CONFIG.JUMP_COOLDOWN_MIN));
+            jumpCooldowns.set(entityId, currentTick + cooldown);
+
+            yield;
         }
-
-        // jump chance scales with neighbors
-        const jumpChance = Math.min(
-            CONFIG.BASE_JUMP_CHANCE + neighborCount * CONFIG.NEIGHBOR_BONUS,
-            CONFIG.MAX_JUMP_CHANCE
-        );
-        if (Math.random() > jumpChance) continue;
-
-        // physics check
-        try {
-            const vel = entity.getVelocity();
-            if (Math.abs(vel.y) > 0.1) continue;
-            const hSpeed = Math.sqrt(vel.x * vel.x + vel.z * vel.z);
-            if (hSpeed < 0.01) continue;
-        } catch { continue; }
-
-        // do the jump
-        doJump(entity);
-        
-        // set cooldown
-        const cooldown = CONFIG.JUMP_COOLDOWN_MIN + 
-            Math.floor(Math.random() * (CONFIG.JUMP_COOLDOWN_MAX - CONFIG.JUMP_COOLDOWN_MIN));
-        jumpCooldowns.set(entityId, currentTick + cooldown);
-
-        yield;
     }
 }
 

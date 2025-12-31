@@ -112,10 +112,8 @@ class FoodSystem {
       ? new ItemStack(item.typeId, newAmount) 
       : undefined);
     
-    // return bowl if needed
+    // return bowl if stew consumed
     if (foodData.returnContainer && newAmount <= 0) {
-      this.tryAddItemToInventory(inventory, new ItemStack(foodData.returnContainer, 1));
-    } else if (foodData.returnContainer && !inventory.isFull()) {
       this.tryAddItemToInventory(inventory, new ItemStack(foodData.returnContainer, 1));
     }
   }

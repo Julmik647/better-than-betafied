@@ -66,8 +66,7 @@
       },
       "minecraft:behavior.melee_box_attack": {
         "can_spread_on_fire": true,
-        "priority": 3,
-        "reach_multiplier": 0.8
+        "priority": 3
       },
       "minecraft:movement": {
         "value": 0.25

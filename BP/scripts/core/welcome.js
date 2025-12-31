@@ -2,7 +2,7 @@ import { world } from "@minecraft/server";
 console.warn("[keirazelle] Welcome System Loaded");
 
 const CONFIG = Object.freeze({
-    VERSION: "3.0.8",
+    VERSION: "3.0.9",
     DELAY_TICKS: 70
 });
 

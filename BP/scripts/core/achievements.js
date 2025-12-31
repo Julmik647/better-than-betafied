@@ -103,12 +103,9 @@ class AchievementSystem {
             }
         });
 
-        // inventory polling - 100 tick interval is fine for direct loop
+        // inventory polling with runJob
         system.runInterval(() => {
-            for (const player of world.getPlayers()) {
-                this.checkInventory(player);
-                this.checkRiding(player);
-            }
+            system.runJob(this.checkAllPlayers());
         }, 100);
 
         // monster hunter
@@ -140,6 +137,17 @@ class AchievementSystem {
                 }
             }
         });
+    }
+
+    // generator for player checks
+    *checkAllPlayers() {
+        for (const player of world.getPlayers()) {
+            try {
+                this.checkInventory(player);
+                this.checkRiding(player);
+            } catch (e) {}
+            yield;
+        }
     }
 
     checkRiding(player) {
