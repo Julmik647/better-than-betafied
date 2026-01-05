@@ -27,6 +27,14 @@
 				"origin": [-2, 0, -2]
 			},
 			"minecraft:light_dampening": 0,
+			"minecraft:item_visual": {
+				"geometry": "geometry.identifier_fence_icon",
+				"material_instances": {
+					"*": {
+						"texture": "oak_planks"
+					}
+				}
+			},
 			"minecraft:loot": "loot_tables/blocks/fence.json",
 			"tag:wood": {},
 			"minecraft:flammable": {
