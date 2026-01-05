@@ -41,7 +41,7 @@ world.beforeEvents.playerInteractWithEntity.subscribe((e) => {
     if (itemStack.typeId !== "minecraft:coal") return;
     if (entity.typeId !== furnaceId) return;
 
-    const variant = entity.getComponent("variant");
+    const variant = entity.getComponent("minecraft:variant");
 
     if (variant && variant.value === 0) {
         system.runTimeout(() => {
@@ -55,7 +55,7 @@ world.beforeEvents.playerInteractWithEntity.subscribe((e) => {
 
 function furnaceFunction(entity) {
     entity.setDynamicProperty("fuelTime", 720); // Temp - should add an inventory and make it hold the actual items later
-    entity.setDynamicProperty("lastPosition", entity.location);
+    entity.setDynamicProperty("lastPosition", JSON.stringify(entity.location));
     startMinecartMovement(entity);
 }
 
@@ -84,7 +84,8 @@ function startMinecartMovement(entity) {
 
         entity.setDynamicProperty("fuelTime", remainingFuel - 1);
 
-        const lastPosition = entity.getDynamicProperty("lastPosition") || entity.location;
+        const lastPosStr = entity.getDynamicProperty("lastPosition");
+        const lastPosition = lastPosStr ? JSON.parse(lastPosStr) : entity.location;
         const currentPosition = entity.location;
         const movement = Vector.normalize({
             x: currentPosition.x - lastPosition.x,
@@ -93,7 +94,7 @@ function startMinecartMovement(entity) {
         });
 
         if (currentPosition.x !== lastPosition.x || currentPosition.y !== lastPosition.y || currentPosition.z !== lastPosition.z){
-            entity.setDynamicProperty("lastPosition", currentPosition);
+            entity.setDynamicProperty("lastPosition", JSON.stringify(currentPosition));
         }
 
         try {
@@ -103,7 +104,7 @@ function startMinecartMovement(entity) {
             const currentVelocity = entity.getVelocity();
             const currentSpeed = Vector.magnitude(currentVelocity);
 
-            if ((Math.abs(movement.x) > 0.01 || Math.abs(movement.z || currentSpeed < 0.35) > 0.01) && onRail) {
+            if ((Math.abs(movement.x) > 0.01 || Math.abs(movement.z) > 0.01 || currentSpeed < 0.35) && onRail) {
                 const hitCart = applyImpulseToCartAndNearby(entity);
                 if (currentSpeed < 0.35 && !hitCart) { 
                     entity.applyImpulse(Vector.multiply(Vector.multiply(movement, -1), 9));

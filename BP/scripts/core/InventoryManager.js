@@ -89,7 +89,7 @@ const ALLOWED = Object.freeze(new Set([
     "minecraft:water", "minecraft:lava",
 
     // custom stuff
-    "bh:bow", "bh:crafting_table", "bh:wooden_slab", "bh:fence", "hrb:herobrine_settings", "hrb:script_openSettings", "minecraft:barrier"
+    "bh:bow", "bh:crafting_table", "bh:wooden_slab", "bh:fence", "hrb:herobrine_settings", "hrb:script_openSettings", "minecraft:barrier", "ubd:furnace_minecart"
 ]));
 
 const CONVERSIONS = Object.freeze({
@@ -104,7 +104,23 @@ const CONVERSIONS = Object.freeze({
     "minecraft:smooth_basalt": "minecraft:stone",
     "minecraft:cobbled_deepslate": "minecraft:cobblestone",
 
-    // copper to cobble lol
+    // modern nether blocks to netherrack
+    "minecraft:magma_block": "minecraft:netherrack",
+    "minecraft:crimson_nylium": "minecraft:netherrack",
+    "minecraft:warped_nylium": "minecraft:netherrack",
+    "minecraft:nether_wart_block": "minecraft:netherrack",
+    "minecraft:warped_wart_block": "minecraft:netherrack",
+    "minecraft:shroomlight": "minecraft:netherrack",
+    "minecraft:basalt": "minecraft:netherrack",
+    "minecraft:polished_basalt": "minecraft:netherrack",
+    "minecraft:blackstone": "minecraft:netherrack",
+    "minecraft:gilded_blackstone": "minecraft:netherrack",
+    "minecraft:ancient_debris": "minecraft:netherrack",
+    "minecraft:nether_gold_ore": "minecraft:netherrack",
+    "minecraft:quartz_ore": "minecraft:netherrack",
+    "minecraft:crying_obsidian": "minecraft:obsidian",
+    "minecraft:soul_soil": "minecraft:soul_sand",
+
     "minecraft:copper_ingot": "minecraft:cobblestone",
     "minecraft:raw_copper": "minecraft:cobblestone",
     "minecraft:copper_ore": "minecraft:stone",
